@@ -7,16 +7,16 @@ library(forecast)
 library(glue)
 library(e1071)
 #
-# library(readr)
-# library(plyr) 
-# library(dbscan)
-# library(tidyverse)
-# library(lubridate)
-# library(dplyr)
-# library(data.table)
-# library(xgboost)
-# library(caret)
-# library(Matrix)
+library(readr)
+library(plyr) 
+library(dbscan)
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+library(data.table)
+library(xgboost)
+library(caret)
+library(Matrix)
 #
 
 train <- read.csv("train.csv")
@@ -37,24 +37,23 @@ attach(train)
 
 all_data <- train %>% bind_rows(test)
 
+#Seasonality for stores 1-10
 ggplot(all_data %>% filter(item == 2), aes(x= as.Date(date), y = sales)) + geom_line() + facet_wrap(~store)
-#forecast_attempt <- forecast(series_time, h = 90)
 
 
 summary(train)
 dim(train)    #913000      4
-table(item, store)
 
 #Adjust Stores and items here
-
+#Store 5 item 1
 train_sample_onestore <- data.frame(train[store == 5 & item == 1,]) #Train Sample
 sample1store <- ts(train_sample_onestore$sales, frequency = 365, start=c(2013,1))
-plot(sample1store)
+plot(sample1store, ylab = "Sales", xlab = "Years", main = "Store 5 Item 1")
 summary(sample1store)
 
 train_sample_allstores <- data.frame(train[store == 1:10 & item == 1,]) #Train Sample
 sampleallstores <- ts(train_sample_allstores$sales, frequency = 365, start=c(2013,1))
-plot(sampleallstores)
+plot(sampleallstores, ylab = "Sales", xlab = "Years", main = "All Stores Item 1")
 summary(sampleallstores)
 
 train_sample <- data.frame(train[store == 1:10 & item == 1,]) #Train Sample
@@ -62,10 +61,8 @@ sample_ts <- ts(train_sample$sales, frequency = 365, start=c(2013,1))
 
 test_sample <- data.frame(test[store == 1:10 & item == 1,]) #Test Sample
 test_ts <- ts(test_sample$sales, frequency = 365, start=c(2013,1))
-plot(test_ts) #Sales per item for example
+#plot(test_ts) #Sales per item for example
 plot(train_sample_onestore)
-
-
 
 ndiffs(sample_ts)
 
@@ -73,7 +70,7 @@ ndiffs(sample_ts)
 #Plots
 #Naive Method
 naiveTS <- naive(sample_ts, h = 90)
-autoplot(naiveTS)
+autoplot(naiveTS, ylab = "Sales", xlab = "Years", main = "Naive TS")
 summary(naiveTS)
 
 #Interpretation:
@@ -88,7 +85,7 @@ summary(naiveTS)
 
 #SNaive Method 
 snaiveTS <- snaive(sample_ts, h = 90)
-autoplot(snaiveTS)
+autoplot(snaiveTS, ylab = "Sales", xlab = "Years", main = "SNaive TS")
 summary(snaiveTS)
 
 #Interpretation:
@@ -101,7 +98,7 @@ summary(snaiveTS)
 
 #SES Method 
 sesTS <- ses(sample_ts, h = 90)
-autoplot(sesTS)
+autoplot(sesTS, ylab = "Sales", xlab = "Years", main = "SES TS")
 summary(sesTS)
 
 #Interpretation:
@@ -115,7 +112,7 @@ summary(sesTS)
 ###############################################################################
 #Holt winters forecasting & residuals
 holty <- holt(sample_ts, h =90)
-autoplot(holty)
+autoplot(holty, ylab = "Sales", xlab = "Years", main = "Holt TS")
 checkresiduals(holty)
 summary(holty)
 
